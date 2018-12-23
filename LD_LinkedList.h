@@ -30,10 +30,10 @@ SOFTWARE.
 #ifndef _LD_LINKEDLISTS_H_
 #define _LD_LINKEDLISTS_H_
 
-
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+
 
 /******************************************************/
 #define G_LinkedList_Node_Define(Datatype) void
