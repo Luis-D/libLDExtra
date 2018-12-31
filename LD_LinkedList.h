@@ -110,8 +110,7 @@ void * D_LinkedList_add(void * List, void * Data, unsigned long Data_Byte_Size)
 
 //Given a data pointer of a node, this functions starts deleting secuent nodes
 //If a function is given, it is executed for each node data section.
-void _LinkedList_remove_continuous(void * Node, void (*Erasing_Function) (void *), void * List_ptr,
-unsigned long Data_Offset,unsigned long Next_Offset)
+void _LinkedList_remove_continuous(void * Node, void (*Erasing_Function) (void *), void * List_ptr,unsigned long Data_Offset,unsigned long Next_Offset)
 {
     //It go backwards sizeof(long)*Data_Offset bytes to get the memory OFFSET of the node
     long * _Node_ = ((long*)Node) - Data_Offset;
@@ -305,7 +304,7 @@ void * D_LinkedList_insert( void * List, void * Data, unsigned long Data_Size,
 #define DoublyLinkedList(Datatype) \
     _LinkedList_Define(Datatype,D_LinkedList_Node_Define)
 #define DoublyLinkedList_add(List_ptr,Data) D_LinkedList_add(List_ptr,&Data,sizeof(Data))  
-#define DoubleLinkedList_append(List_ptr,Data) DoublyLinkedList_add(List_ptr,Data) 
+#define DoublyLinkedList_append(List_ptr,Data) DoublyLinkedList_add(List_ptr,Data) 
 #define DoublyLinkedList_insert_after(List_ptr,Data,Node_ptr) \
     D_LinkedList_insert(List_ptr,&Data,sizeof(Data),Node_ptr,0)
 #define DoublyLinkedList_insert_before(List_ptr,Data,Node_ptr) \
@@ -316,10 +315,10 @@ void * D_LinkedList_insert( void * List, void * Data, unsigned long Data_Size,
     D_LinkedList_remove(List_ptr,Data,Function)
 #define DoublyLinkedList_remove_onwards(List_ptr,Data_ptr,Function) \
     _LinkedList_remove_continuous(Data_ptr,Function,__gllptr(List_ptr),2,1)
-#define DoublyLinkedList_remove_backwards(List_ptr,Data,Function) \
+#define DoublyLinkedList_remove_backwards(List_ptr,Data_ptr,Function) \
     _LinkedList_remove_continuous(Data_ptr,Function,__gllptr(List_ptr),2,2)
 #define DoublyLinkedList_clear(List_ptr,Function)	\
-    DoublyLinkedList_remove_onwards(NULL,&__gll_d_ptr(__gllptr(List_ptr)->First)->Data,Function) \
+    DoublyLinkedList_remove_onwards(NULL,&__gll_d_ptr(__gllptr(List_ptr)->First)->Data,Function); \
     G_LinkedList_Reset(List_ptr)
 #define DoublyLinkedList_Destroy(List_ptr,Function) \
     DoublyLinkedList_remove_onwards(NULL,&__gll_d_ptr(__gllptr(List_ptr)->First)->Data,Function); \

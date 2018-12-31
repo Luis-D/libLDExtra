@@ -12,10 +12,10 @@
 #define _repeat(counter,times) for(int counter = times;i--;)
 #define _swap(a,b) a = a ^ b; b = a ^ b; a = a ^ b
 
-#define array_foreach(Item,Array,Array_Size)\
-    for(void * Item = Array; Item <(Array+Array_Size);((long*)Item)++)
-#define array_foreach_reverse(Item,Array,Array_Size)\
-    for(void * Item = (Array+(Array_Size-1));Item>=Array;((long*)Item)--)
+#define array_foreach(type,Item,Array,Array_Size)\
+    for(type * Item = Array; Item <(Array+Array_Size);(Item)++)
+#define array_foreach_reverse(type,Item,Array,Array_Size)\
+    for(type * Item = (Array+(Array_Size-1));Item>=Array;(Item)--)
 
 
 #endif
