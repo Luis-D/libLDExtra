@@ -15,7 +15,7 @@
 
 #define _Graph_Node_Define(Datatype) \
     struct{			     \
-	unsigned long Degree;   \
+	uintptr_t Degree;   \
 	void * Connections_Array;    \
 	Datatype Data;		     \
     }
@@ -41,7 +41,7 @@ void * Graph_Create()
 static char _Graph_Node_connect_new(void * A, void * B)
 {
     void * tmp_A; void * tmp_B = NULL;
-    unsigned long Size_A =(__gg_n_ptr(A)->Degree) +1;
+    uintptr_t Size_A =(__gg_n_ptr(A)->Degree) +1;
     if(__gg_n_ptr(A)-> Degree == 0)
     {
 	tmp_A = malloc(sizeof(void*));
@@ -55,7 +55,7 @@ static char _Graph_Node_connect_new(void * A, void * B)
     
     if(B!=NULL)
     {
-	    unsigned long Size_B =(__gg_n_ptr(B)->Degree) +1;
+	    uintptr_t Size_B =(__gg_n_ptr(B)->Degree) +1;
 	    if(__gg_n_ptr(B)-> Degree == 0)
 	    {
 		tmp_B = malloc(sizeof(void*));
@@ -79,12 +79,12 @@ static char _Graph_Node_connect_new(void * A, void * B)
     return 1;
 }
 
-static void __Graph_Node_set(void * RET,void * Data, unsigned long Data_Byte_Size)
+static void __Graph_Node_set(void * RET,void * Data, uintptr_t Data_Byte_Size)
 {
     __gg_n_ptr(RET)->Degree = 0;
     __gg_n_ptr(RET)->Connections_Array =NULL;
 
-   memcpy(((long*)RET)+2,Data,Data_Byte_Size);
+   memcpy(((uintptr_t*)RET)+2,Data,Data_Byte_Size);
 }
 
 void _Graph_Node_deallocate(void * Node)
@@ -92,12 +92,12 @@ void _Graph_Node_deallocate(void * Node)
     free(__gg_n_ptr(Node)->Connections_Array);
 }
 
-void * _Graph_Node_add(void * Graph,void * Parent,void * Data,unsigned long Data_Byte_Size)
+void * _Graph_Node_add(void * Graph,void * Parent,void * Data,uintptr_t Data_Byte_Size)
 {
     void * _Parent_=NULL;
-    if(Parent!=NULL){_Parent_ = ((long*)Parent)-2;} //<- Get node's Head
+    if(Parent!=NULL){_Parent_ = ((uintptr_t*)Parent)-2;} //<- Get node's Head
 
-    unsigned long Node_Size = Data_Byte_Size + sizeof(_Graph_Node_Define(void*)) - sizeof(void*);
+    uintptr_t Node_Size = Data_Byte_Size + sizeof(_Graph_Node_Define(void*)) - sizeof(void*);
 
     void*RET = S_LinkedList_add(__ggptr(Graph)->Nodes,NULL,Node_Size); //It holds the Node's head;
     if(RET==NULL){return NULL;}

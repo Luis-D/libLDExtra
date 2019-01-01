@@ -36,7 +36,7 @@
 #define Queue_Destroy(queue) SinglyLinkedList_Destroy(queue,NULL)
 
 	/** Priority Queue **/
-void * _Queue_priority_enqueue(void * queue,void * data_ptr, unsigned long Data_Byte_Size,
+void * _Queue_priority_enqueue(void * queue,void * data_ptr, uintptr_t Data_Byte_Size,
     char (*comparition_callback) (void*,void*))
 {
     if(Queue_Length(queue) > 0)

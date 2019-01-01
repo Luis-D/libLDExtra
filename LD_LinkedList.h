@@ -1,3 +1,4 @@
+#include "LD_Tricks.h"
 // MACROS and functions to make and handle Linked Lists
 // (Singly and Doubly Linked Lists)
 // It's a kind of template library
@@ -46,7 +47,7 @@ SOFTWARE.
     struct {					    \
 	    NodeType(Datatype) * First;		    \
 	    NodeType(Datatype) * Last;		    \
-	    unsigned long length;		    \
+	    uintptr_t length;		    \
     }
 
 #define G_LinkedList_Reset(List_ptr)		    \
@@ -71,11 +72,11 @@ void * LinkedList_Create()
 }
 
 static void * __LinkedList_node_allocate
-(void * Data, unsigned long Data_Byte_Size, unsigned long Data_Offset)
+(void * Data, uintptr_t Data_Byte_Size, uintptr_t Data_Offset)
 {
     void * tmp = malloc(Data_Byte_Size+(sizeof(void*)*Data_Offset));
     if(tmp==NULL){return NULL;}  
-    if(Data!=NULL){memcpy(((long*) tmp)+Data_Offset, Data, Data_Byte_Size);}
+    if(Data!=NULL){memcpy(((uintptr_t*) tmp)+Data_Offset, Data, Data_Byte_Size);}
     return tmp;
 }
 
@@ -88,7 +89,7 @@ static void * __LinkedList_node_allocate
     else{__gll(__gllptr(List)->Last)->Next=tmp;}	    
 
 //Add a value to a singly linked list
-void * S_LinkedList_add(void * List, void * Data,unsigned long Data_Byte_Size)
+void * S_LinkedList_add(void * List, void * Data,uintptr_t Data_Byte_Size)
 {
     void * tmp;
     __Generic_LinkedList_add(List,Data,Size,tmp,__gll_s_ptr,1);
@@ -98,7 +99,7 @@ void * S_LinkedList_add(void * List, void * Data,unsigned long Data_Byte_Size)
 }
 
 //Add a value to a doubly linked list
-void * D_LinkedList_add(void * List, void * Data, unsigned long Data_Byte_Size)
+void * D_LinkedList_add(void * List, void * Data, uintptr_t Data_Byte_Size)
 {
     void * tmp;
     __Generic_LinkedList_add(List,Data,Size,tmp,__gll_d_ptr,2);
@@ -110,13 +111,13 @@ void * D_LinkedList_add(void * List, void * Data, unsigned long Data_Byte_Size)
 
 //Given a data pointer of a node, this functions starts deleting secuent nodes
 //If a function is given, it is executed for each node data section.
-void _LinkedList_remove_continuous(void * Node, void (*Erasing_Function) (void *), void * List_ptr,unsigned long Data_Offset,unsigned long Next_Offset)
+void _LinkedList_remove_continuous(void * Node, void (*Erasing_Function) (void *), void * List_ptr,uintptr_t Data_Offset,uintptr_t Next_Offset)
 {
-    //It go backwards sizeof(long)*Data_Offset bytes to get the memory OFFSET of the node
-    long * _Node_ = ((long*)Node) - Data_Offset;
+    //It go backwards sizeof(uintptr_t)*Data_Offset bytes to get the memory OFFSET of the node
+    uintptr_t * _Node_ = ((uintptr_t*)Node) - Data_Offset;
     void * tmp;   
-    
-    unsigned long Count =0;
+ 
+    uintptr_t Count =0;
 
     //This way the comparing instruction can be avoided inside the loop. 
     if(Erasing_Function==NULL)
@@ -134,7 +135,7 @@ void _LinkedList_remove_continuous(void * Node, void (*Erasing_Function) (void *
 	while(_Node_!=NULL)
 	{
 	    tmp = (void*) _Node_[Data_Offset-Next_Offset]; //<- Getting the NEXT
-	    Erasing_Function(((long*)_Node_)+Data_Offset); //<- Sending the Data section
+	    Erasing_Function(((uintptr_t*)_Node_)+Data_Offset); //<- Sending the Data section
 	    free(_Node_);
 	    _Node_=tmp;
 	    Count++;
@@ -143,19 +144,19 @@ void _LinkedList_remove_continuous(void * Node, void (*Erasing_Function) (void *
 
     if(List_ptr != NULL){
 	(__gllptr(List_ptr)->length)-=Count;
-	if(__gllptr(List_ptr)->First == (((long*)Node) - Data_Offset))
+	if(__gllptr(List_ptr)->First == (((uintptr_t*)Node) - Data_Offset))
 	{__gllptr(List_ptr)->First=NULL;}
     }
 }
 
 void D_LinkedList_remove(void * List, void * Node, void (*Deleting_Function) (void*))
 {
-    void * Curr = (((long*) Node)-2);
+    void * Curr = (((uintptr_t*) Node)-2);
     
     if(Deleting_Function != NULL){Deleting_Function(Curr);}    
 
-    void * Previous = (void*) *((long*)Curr);
-    void * Next =(void*) ((long*)Curr)[1];
+    void * Previous = (void*) *((uintptr_t*)Curr);
+    void * Next =(void*) ((uintptr_t*)Curr)[1];
  
     if(Previous!=NULL)	{__gll_d_ptr(Previous)->Next=Next;}    
     if(Next!=NULL)	{__gll_d_ptr(Next)->Previous=Previous;} 
@@ -177,7 +178,7 @@ void D_LinkedList_remove(void * List, void * Node, void (*Deleting_Function) (vo
     free(Curr);
 }
 
-void * S_LinkedList_prepend(void * List, void * Data, unsigned long Data_Size)
+void * S_LinkedList_prepend(void * List, void * Data, uintptr_t Data_Size)
 {
     void * RET = __LinkedList_node_allocate(Data, Data_Size,1);
     if(RET==NULL){return NULL;}
@@ -188,14 +189,14 @@ void * S_LinkedList_prepend(void * List, void * Data, unsigned long Data_Size)
     return &__gll_s_ptr(RET)->Data;
 }
 
-void * S_LinkedList_insert(void * List, void * Data, unsigned long Data_Size,void * Node_ptr)
+void * LinkedList_insert_EXT(void * List, void * Data, uintptr_t Data_Size,void * Node_ptr)
 {
     if(List!=NULL && Node_ptr ==NULL)
     {
 	return S_LinkedList_prepend(List,Data,Data_Size);
     }
 
-    void * Ref_Node =(void*) (((long*) Node_ptr)-1);
+    void * Ref_Node =(void*) (((uintptr_t*) Node_ptr)-1);
     void * RET = __LinkedList_node_allocate(Data, Data_Size,1);
     if(RET==NULL){return NULL;}
 
@@ -209,22 +210,22 @@ void * S_LinkedList_insert(void * List, void * Data, unsigned long Data_Size,voi
     return &__gll_s_ptr(RET)->Data;
 }
 
-void * D_LinkedList_insert( void * List, void * Data, unsigned long Data_Size, 
-			    void * Node_ptr, unsigned long Next_Offset)
+void * DoublyLinkedList_insert_EXT( void * List, void * Data, uintptr_t Data_Size, 
+			    void * Node_ptr, uintptr_t Next_Offset)
 {
-    void * Ref_Node =(void*) (((long*) Node_ptr)-2);
+    void * Ref_Node =(void*) (((uintptr_t*) Node_ptr)-2);
     void * RET = __LinkedList_node_allocate(Data, Data_Size,2);
     if(RET==NULL){return NULL;}
     
-    unsigned long Other = Next_Offset ^ 1;
-    unsigned long Next_Other = ((long*) Ref_Node)[Other]; 
+    uintptr_t Other = Next_Offset ^ 1;
+    uintptr_t Next_Other = ((uintptr_t*) Ref_Node)[Other]; 
 
-    ((long*)RET)[Next_Offset] =(unsigned long)  Ref_Node;
-    ((long*)RET)[Other] = Next_Other;
+    ((uintptr_t*)RET)[Next_Offset] =(uintptr_t)  Ref_Node;
+    ((uintptr_t*)RET)[Other] = Next_Other;
     
     if(__gllptr(List) != NULL)
     {
-	if(Next_Other == (unsigned long) NULL)
+	if(Next_Other == (uintptr_t) NULL)
 	{
 	    if(Next_Offset == 0) //If it was an insert after the reference node...
 	    {
@@ -244,12 +245,12 @@ void * D_LinkedList_insert( void * List, void * Data, unsigned long Data_Size,
 
 //These MACROS access the pointers located in the same node where the Data is.
 //They return a pointer (void*) to the data of the next (or previous) node of the list.
-#define Next_to(Data_ptr)	(void*) ((long*) (*(((long*) Data_ptr)-1))+1)
-#define Previous_to(Data_ptr)	(void*) ((long*) (*(((long*) Data_ptr)-2))+2)
+#define Next_to(Data_ptr)	(void*) ((uintptr_t*) (*(((uintptr_t*) Data_ptr)-1))+1)
+#define Previous_to(Data_ptr)	(void*) ((uintptr_t*) (*(((uintptr_t*) Data_ptr)-2))+2)
 
 #define _LinkedList_First(List_ptr) (void*) __gllptr(List_ptr)->First
 #define _LinkedList_Last(List_ptr) (void*) __gllptr(List_ptr)->Last
-#define LinkedList_Length(List_ptr) (unsigned long) __gllptr(List_ptr)->length
+#define LinkedList_Length(List_ptr) (uintptr_t) __gllptr(List_ptr)->length
 #define LinkedList_Empty(List_ptr) \
     (__gllptr(List_ptr)->First == NULL)
 
@@ -269,7 +270,7 @@ void * D_LinkedList_insert( void * List, void * Data, unsigned long Data_Size,
 #define LinkedList_append(List_ptr,Data) LinkedList_add(List_ptr,Data)
 #define LinkedList_prepend(List_ptr,Data) S_LinkedList_prepend(List_ptr,&Data,sizeof(Data))
 #define LinkedList_insert(list_ptr,data,node_ptr) \
-    S_LinkedList_insert(list_ptr,&data, sizeof(data),node_ptr)
+    LinkedList_insert_EXT(list_ptr,&data, sizeof(data),node_ptr)
 #define LinkedList_remove(List_ptr,Data_ptr,Function) \
     _LinkedList_remove_continuous(Data_ptr,Function,__gllptr(List_ptr),1,1)
 #define LinkedList_clear(List_ptr,Function)	\
@@ -287,7 +288,9 @@ void * D_LinkedList_insert( void * List, void * Data, unsigned long Data_Size,
 #define SinglyLinkedList_add(Data_ptr,Func) LinkedList_add(Data_ptr,Func)
 #define SinglyLinkedList_append(List_ptr,Data) SinglyLinkedList_add(List_ptr,Data)
 #define SinglyLinkedList_prepend(List_ptr,Data) SinglyLinkedList_prepend(List_ptr,Data)
-#define Singlylinkedlist_insert(list_ptr,data,node_ptr) \
+#define SinglyLinkedList_insert_EXT(List_ptr,Data_ptr,DataSize,node_ptr)\
+    LinkedList_insert_EXT(List_ptr,Data_ptr, DataSize,node_ptr)
+#define SinglyLinkedList_insert(list_ptr,data,node_ptr) \
     LinkedList_insert(list_ptr,data,node_ptr) 
 #define SinglyLinkedList_remove(List_ptr,Data_ptr,Func) LinkedList_remove(List_ptr,Data_ptr,Func)
 #define SinglyLinkedList_clear(List_ptr,Func) LinkedList_clear(List_ptr,Func)
@@ -306,9 +309,9 @@ void * D_LinkedList_insert( void * List, void * Data, unsigned long Data_Size,
 #define DoublyLinkedList_add(List_ptr,Data) D_LinkedList_add(List_ptr,&Data,sizeof(Data))  
 #define DoublyLinkedList_append(List_ptr,Data) DoublyLinkedList_add(List_ptr,Data) 
 #define DoublyLinkedList_insert_after(List_ptr,Data,Node_ptr) \
-    D_LinkedList_insert(List_ptr,&Data,sizeof(Data),Node_ptr,0)
+    DoublyLinkedList_insert_EXT(List_ptr,&Data,sizeof(Data),Node_ptr,0)
 #define DoublyLinkedList_insert_before(List_ptr,Data,Node_ptr) \
-    D_LinkedList_insert(List_ptr,&Data,sizeof(Data),Node_ptr,1)
+    DoublyLinkedList_insert_EXT(List_ptr,&Data,sizeof(Data),Node_ptr,1)
 #define DoublyLinkedList_prepend(List_ptr,Data) \
     DoublyLinkedList_insert_before(List_ptr,Data,DoubleLinkedList_First(List_ptr))
 #define DoublyLinkedList_remove(List_ptr,Data,Function) \

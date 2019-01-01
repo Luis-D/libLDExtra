@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <stdint.h>
+
 #define _new(type,var_counts) (type*) malloc(sizeof(type) * var_counts)
 #define _resize(type,pointer,var_counts) (type*) realloc(pointer,sizeof(type)*var_counts)
 #define _repeat(counter,times) for(int counter = times;i--;)
