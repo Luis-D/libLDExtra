@@ -209,6 +209,7 @@ void * LinkedList_insert_EXT(void * List, void * Data, uintptr_t Data_Size,void 
     }
     return &__gll_s_ptr(RET)->Data;
 }
+#define S_LinkedList_insert LinkedList_insert_EXT
 
 void * DoublyLinkedList_insert_EXT( void * List, void * Data, uintptr_t Data_Size, 
 			    void * Node_ptr, uintptr_t Next_Offset)
