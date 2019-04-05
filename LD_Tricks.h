@@ -12,7 +12,7 @@
 #define _repeat(counter,times) for(int counter = times;i--;)
 #define _swap(a,b) a = a ^ b; b = a ^ b; a = a ^ b
 #define _zero(a) a ^= a
-#define _NULL(a) _zero
+#define _NULL _zero
 #define _test(var,bitmask) ((var & bitmask) == bitmask)
 #define _checkbits(var,bitmask) _test(var,bitmask)
 
