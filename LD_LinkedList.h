@@ -1,4 +1,4 @@
-#include "LD_Tricks.h"
+
 // MACROS and functions to make and handle Linked Lists
 // (Singly and Doubly Linked Lists)
 // It's a kind of template library
@@ -31,6 +31,7 @@ SOFTWARE.
 #ifndef _LD_LINKEDLISTS_H_
 #define _LD_LINKEDLISTS_H_
 
+#include "LD_Tricks.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -77,13 +78,14 @@ static void * __LinkedList_node_allocate
     void * tmp = malloc(Data_Byte_Size+(sizeof(void*)*Data_Offset));
     if(tmp==NULL){return NULL;}  
     if(Data!=NULL){memcpy(((uintptr_t*) tmp)+Data_Offset, Data, Data_Byte_Size);}
+    
     return tmp;
 }
 
 
-#define __Generic_LinkedList_add(List,Data,Size,tmp,__gll,__type)   \
+#define __Generic_LinkedList_add(List,Data,Data_Byte_Size,tmp,__gll,__type)   \
     tmp = __LinkedList_node_allocate(Data, Data_Byte_Size,__type);  \
-    if(tmp==NULL){return NULL;}					    \
+    if(tmp==NULL){return NULL;};					    \
     (__gllptr(List)->length)++;					    \
     if(__gllptr(List)->First==NULL){__gllptr(List)->First=tmp;}	    \
     else{__gll(__gllptr(List)->Last)->Next=tmp;}	    
@@ -92,7 +94,7 @@ static void * __LinkedList_node_allocate
 void * S_LinkedList_add(void * List, void * Data,uintptr_t Data_Byte_Size)
 {
     void * tmp;
-    __Generic_LinkedList_add(List,Data,Size,tmp,__gll_s_ptr,1);
+    __Generic_LinkedList_add(List,Data,Data_Byte_Size,tmp,__gll_s_ptr,1);
     __gll_s_ptr(tmp)->Next=NULL;
     __gllptr(List)->Last = tmp;
     return &(__gll_s_ptr(tmp)->Data); //<- It returns a pointer to the data section of the node;
@@ -102,7 +104,7 @@ void * S_LinkedList_add(void * List, void * Data,uintptr_t Data_Byte_Size)
 void * D_LinkedList_add(void * List, void * Data, uintptr_t Data_Byte_Size)
 {
     void * tmp;
-    __Generic_LinkedList_add(List,Data,Size,tmp,__gll_d_ptr,2);
+    __Generic_LinkedList_add(List,Data,Data_Byte_Size,tmp,__gll_d_ptr,2);
     __gll_d_ptr(tmp)->Previous = __gllptr(List)->Last;
     __gll_d_ptr(tmp)->Next=NULL;
     __gllptr(List)->Last = tmp;
