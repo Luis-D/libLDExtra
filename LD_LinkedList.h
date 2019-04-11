@@ -1,4 +1,4 @@
-
+#include "LD_Tricks.h"
 // MACROS and functions to make and handle Linked Lists
 // (Singly and Doubly Linked Lists)
 // It's a kind of template library
@@ -31,7 +31,6 @@ SOFTWARE.
 #ifndef _LD_LINKEDLISTS_H_
 #define _LD_LINKEDLISTS_H_
 
-#include "LD_Tricks.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
